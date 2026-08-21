@@ -1,0 +1,154 @@
+:root {
+  color-scheme: dark;
+  --bg: #050806;
+  --text: #a8c9ad;
+  --muted: #58705d;
+  --line: #18321f;
+  --accent: #75e08a;
+  --accent-bright: #a2f5ae;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --text: #000000;
+  --muted: #000000;
+  --line: #000000;
+  --accent: #000000;
+  --accent-bright: #000000;
+}
+
+* { box-sizing: border-box; }
+
+::selection {
+  color: var(--bg);
+  background: var(--accent);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.terminal {
+  width: min(100% - 40px, 820px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 42px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 4px;
+}
+
+a { color: var(--text); text-underline-offset: 3px; }
+a:hover, a:focus-visible, a.active {
+  color: var(--accent-bright);
+  outline: none;
+}
+
+.identity {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  gap: 16px;
+}
+
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.theme-toggle {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--accent-bright);
+  outline: 1px dashed currentColor;
+  outline-offset: 3px;
+}
+
+.terminal-rule {
+  margin: 0;
+  width: 100%;
+  border-top: 1px dashed var(--line);
+}
+
+.view { padding: 42px 0; }
+
+.command, time, article p { color: var(--muted); }
+
+h1 { font-size: 1em; font-weight: 500; }
+h1 { letter-spacing: .08em; }
+
+.ascii-table {
+  margin: 0;
+  overflow-x: auto;
+  color: var(--text);
+  background: transparent;
+  font: inherit;
+  line-height: 1.65;
+  white-space: pre;
+}
+
+.ascii-border { color: var(--line); }
+.ascii-label,
+.ascii-table time { color: var(--muted); }
+.ascii-table a { color: var(--accent); }
+
+.cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--accent);
+  animation: blink 1s steps(1) infinite;
+}
+
+.local-time {
+  margin-top: auto;
+  padding-top: 80px;
+  color: var(--muted);
+}
+
+.local-time > p {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 12px 0 0;
+}
+
+.local-time > p + p {
+  margin-top: 2px;
+}
+
+.local-time time,
+.local-time output {
+  color: var(--text);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@media (max-width: 560px) {
+  header { display: block; }
+  nav { margin-top: 14px; }
+}

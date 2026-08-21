@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alejandro — status</title>
+  <script>
+    try {
+      const savedTheme = localStorage.getItem("alejans-theme");
+      if (savedTheme === "light" || savedTheme === "dark") {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch {}
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="terminal">
+    <header>
+      <a class="identity" href="#status" data-view="status">alejandro@home:~$</a>
+      <nav>
+        <a href="#status" data-view="status">status</a>
+        <a href="#notes" data-view="notes">notes</a>
+        <a href="#published" data-view="published">published</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="true">[ dark ]</button>
+      </nav>
+    </header>
+    <div class="terminal-rule" aria-hidden="true"></div>
+
+    <section id="status" class="view">
+      <p class="command">~/status $ now</p>
+      <h1>CURRENT STATUS<span class="cursor" aria-hidden="true">|</span></h1>
+
+      <pre id="status-table" class="ascii-table" aria-label="Current status table"></pre>
+    </section>
+
+    <section id="notes" class="view" hidden>
+      <p class="command">~/notes $ ls -t</p>
+      <h1>NOTES<span class="cursor" aria-hidden="true">|</span></h1>
+      <pre id="notes-table" class="ascii-table" aria-label="Notes table"></pre>
+    </section>
+
+    <section id="published" class="view" hidden>
+      <p class="command">~/published $ ls -t</p>
+      <h1>PUBLISHED<span class="cursor" aria-hidden="true">|</span></h1>
+      <pre id="published-table" class="ascii-table" aria-label="Published projects table"></pre>
+    </section>
+
+    <footer class="local-time">
+      <div class="terminal-rule" aria-hidden="true"></div>
+      <p><span>local_time</span><time id="clock" aria-live="polite">Loading…</time></p>
+      <p><span>from_eastern</span><output id="time-zone-counter" aria-live="polite">Calculating…</output></p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
