@@ -13,39 +13,123 @@ const easternTimeZone = "America/New_York";
 // The overnight chunk covers midnight through 6am and 10pm through midnight.
 const statusSchedule = {
   Sunday: {
-    daytime: { status: "offline", working_on: "resting", location: "at home", where_you_can_find_me: "away from the desk" },
-    evening: { status: "offline", working_on: "getting ready for the week", location: "at home", where_you_can_find_me: "most likely at home" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime:  { status: "online",
+                working_on: "new projects",
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    evening:  { status: "online",
+                working_on: "preparing for the week",     
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    overnight:{ status: "offline",          
+                working_on: "nothing",
+                location: "Florida", 
+                where_you_can_find_me: "home" 
+              },
   },
   Monday: {
-    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
-    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime:  { status: "online",                      
+                working_on: "performance analysis",       
+                location: "Florida", 
+                where_you_can_find_me: "in the lab" 
+              },
+    evening: {  status: "online",                       
+                working_on: "new projects",                    
+                location: "Florida", 
+                where_you_can_find_me: "out and about"
+               },
+    overnight:{ status: "offline",                      
+                working_on: "nothing",                    
+                location: "Florida",
+                where_you_can_find_me: "home" 
+              },
   },
   Tuesday: {
-    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
-    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime: {  status: "online",                      
+                working_on: "innovative solutions",       
+                location: "Florida", 
+                where_you_can_find_me: "in the lab" 
+              },
+    evening: {  status: "online",                       
+                working_on: "new projects",                    
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    overnight:{ status: "offline",                      
+                working_on: "nothing",                    
+                location: "Florida", 
+                where_you_can_find_me: "home" 
+              },
   },
   Wednesday: {
-    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
-    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime: {  status: "online",                      
+                working_on: "building structs",           
+                location: "Florida", 
+                where_you_can_find_me: "in the lab" 
+              },
+    evening: {  status: "online",                       
+                working_on: "new projects",                    
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    overnight:{ status: "offline",                      
+                working_on: "nothing",                    
+                location: "Florida", 
+                where_you_can_find_me: "home" 
+              },
   },
   Thursday: {
-    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
-    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime: {  status: "online",                      
+                working_on: "initializing arrays", 
+                location: "Florida", 
+                where_you_can_find_me: "in the lab" 
+              },
+    evening: {  status: "online",                          
+                working_on: "new projects",                    
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    overnight:{ status: "probably online",                      
+                working_on: "new projects",                    
+                location: "Florida", 
+                where_you_can_find_me: "probably out and about" 
+              },
   },
   Friday: {
-    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
-    evening: { status: "offline", working_on: "unwinding", location: "out and about", where_you_can_find_me: "not at my desk" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime: {  status: "online",    
+                working_on: "new projects", 
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    evening: {  status: "online",                          
+                working_on: "new projects", 
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    overnight:{ status: "probably online",          
+                working_on: "new projects", 
+                location: "Florida", 
+                where_you_can_find_me: "probably out and about" 
+              },
   },
   Saturday: {
-    daytime: { status: "offline", working_on: "exploring", location: "out and about", where_you_can_find_me: "probably outside" },
-    evening: { status: "offline", working_on: "unwinding", location: "out and about", where_you_can_find_me: "probably outside" },
-    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+    daytime: {  status: "online", 
+                working_on: "new projects", 
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    evening: {  status: "online", 
+                working_on: "new projects", 
+                location: "Florida", 
+                where_you_can_find_me: "out and about" 
+              },
+    overnight:{ status: "probably online", 
+                working_on: "new projects", 
+                location: "Florida", 
+                where_you_can_find_me: "probably out and about" 
+              },
   },
 };
 
