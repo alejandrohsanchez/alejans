@@ -1,30 +1,68 @@
 const clock = document.querySelector("#clock");
 const timeZoneCounter = document.querySelector("#time-zone-counter");
 const themeToggle = document.querySelector("#theme-toggle");
+const articleContent = document.querySelector("#article-content");
+const articleBack = document.querySelector("#article-back");
+const interactiveTerminal = document.querySelector("#interactive-terminal");
+const terminalInput = document.querySelector("#terminal-input");
+const terminalOutput = document.querySelector("#terminal-output");
 const themeStorageKey = "alejans-theme";
 const easternTimeZone = "America/New_York";
 
-// Edit table content here. Add another array for a row, or add another value
-// inside each row for a new column. Widths and ASCII borders update automatically.
+// Edit this schedule to describe the most likely status for each day and time.
+// The overnight chunk covers midnight through 6am and 10pm through midnight.
+const statusSchedule = {
+  Sunday: {
+    daytime: { status: "offline", working_on: "resting", location: "at home", where_you_can_find_me: "away from the desk" },
+    evening: { status: "offline", working_on: "getting ready for the week", location: "at home", where_you_can_find_me: "most likely at home" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+  Monday: {
+    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
+    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+  Tuesday: {
+    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
+    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+  Wednesday: {
+    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
+    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+  Thursday: {
+    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
+    evening: { status: "offline", working_on: "reading", location: "at home", where_you_can_find_me: "most likely at home" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+  Friday: {
+    daytime: { status: "at my desk", working_on: "small things, carefully", location: "the lab", where_you_can_find_me: "most likely in the lab" },
+    evening: { status: "offline", working_on: "unwinding", location: "out and about", where_you_can_find_me: "not at my desk" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+  Saturday: {
+    daytime: { status: "offline", working_on: "exploring", location: "out and about", where_you_can_find_me: "probably outside" },
+    evening: { status: "offline", working_on: "unwinding", location: "out and about", where_you_can_find_me: "probably outside" },
+    overnight: { status: "sleeping", working_on: "nothing", location: "at home", where_you_can_find_me: "offline" },
+  },
+};
+
+// Edit other ASCII table content here. Add another array for a row, or add
+// another value inside each row for a new column.
 const tables = {
   status: {
     elementId: "status-table",
     columnClasses: ["ascii-label", ""],
-    rows: [
-      ["what_im_probably_doing_right_now", "sleeping"],
-      ["working_on", "small things, carefully"],
-      ["location", "the tropics"],
-      ["where_you_can_find_me", "most likely in the lab"],
-    ],
+    rows: [],
   },
   notes: {
     elementId: "notes-table",
     emptyMessage: "no notes yet",
     emptyColumnWidth: 42,
     columnClasses: ["ascii-label", ""],
-    rows: [
-      // ["2026-08-21 14:30", { text: "first-note.md", href: "#" }],
-    ],
+    rows: [],
   },
   published: {
     elementId: "published-table",
@@ -36,6 +74,205 @@ const tables = {
     ],
   },
 };
+
+const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function getCurrentStatus(date = new Date()) {
+  const hour = date.getHours();
+  const timeChunk = hour >= 6 && hour < 18 ? "daytime" : hour >= 18 && hour < 22 ? "evening" : "overnight";
+  return statusSchedule[weekdayNames[date.getDay()]][timeChunk];
+}
+
+function updateStatusTable(date = new Date()) {
+  tables.status.rows = Object.entries(getCurrentStatus(date));
+  renderAsciiTable(tables.status);
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[character]);
+}
+
+function renderInlineMarkdown(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/_([^_]+)_|\*([^*]+)\*/g, (_, italicText, starredText) => `<em>${italicText ?? starredText}</em>`);
+  html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" rel="noreferrer">$1</a>');
+  return html;
+}
+
+function renderMarkdown(markdown) {
+  const fragment = document.createDocumentFragment();
+  let paragraphLines = [];
+  let list = null;
+
+  const flushParagraph = () => {
+    if (!paragraphLines.length) return;
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = paragraphLines.map(renderInlineMarkdown).join(" ");
+    fragment.append(paragraph);
+    paragraphLines = [];
+  };
+
+  const flushList = () => {
+    if (!list) return;
+    fragment.append(list);
+    list = null;
+  };
+
+  markdown.split(/\r?\n/).map((line) => line.trim()).forEach((line) => {
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    const unorderedItem = line.match(/^[-*]\s+(.+)$/);
+    const orderedItem = line.match(/^\d+\.\s+(.+)$/);
+
+    if (heading) {
+      flushParagraph();
+      flushList();
+      const element = document.createElement(`h${heading[1].length}`);
+      element.innerHTML = renderInlineMarkdown(heading[2]);
+      fragment.append(element);
+    } else if (unorderedItem || orderedItem) {
+      flushParagraph();
+      const listType = unorderedItem ? "ul" : "ol";
+      if (!list || list.nodeName.toLowerCase() !== listType) {
+        flushList();
+        list = document.createElement(listType);
+      }
+      const item = document.createElement("li");
+      item.innerHTML = renderInlineMarkdown((unorderedItem || orderedItem)[1]);
+      list.append(item);
+    } else if (line.trim() === "") {
+      flushParagraph();
+      flushList();
+    } else {
+      flushList();
+      paragraphLines.push(line);
+    }
+  });
+
+  flushParagraph();
+  flushList();
+  return fragment;
+}
+
+function updateNotesTable() {
+  tables.notes.rows = notes.map((note) => [
+    note.metadata.published,
+    { text: note.name, href: `#article/${encodeURIComponent(note.slug)}` },
+  ]);
+  renderAsciiTable(tables.notes);
+}
+
+function getPublishedEntries() {
+  return tables.published.rows.flatMap((row) => {
+    const name = normalizeCell(row[1]);
+    return name.text ? [{ name: name.text, href: name.href }] : [];
+  });
+}
+
+function setTerminalOutput(content) {
+  if (!terminalOutput) return;
+  terminalOutput.replaceChildren();
+  if (typeof content === "string") terminalOutput.textContent = content;
+  else terminalOutput.append(content);
+}
+
+function showTerminalHelp() {
+  setTerminalOutput(`status       open the status page
+notes        open the notes page
+published    open the published page
+theme -l     switch to light theme
+theme -d     switch to dark theme
+clear        clear the terminal
+find -"text" search note and project names`);
+}
+
+function showSearchResults(query) {
+  const normalizedQuery = query.toLocaleLowerCase();
+  const matches = [
+    ...notes
+      .filter((note) => note.name.toLocaleLowerCase().includes(normalizedQuery))
+      .map((note) => ({ name: note.name, href: `#article/${encodeURIComponent(note.slug)}` })),
+    ...getPublishedEntries().filter((project) => project.name.toLocaleLowerCase().includes(normalizedQuery)),
+  ].slice(0, 3);
+
+  if (!matches.length) {
+    setTerminalOutput("no match found");
+    return;
+  }
+
+  const output = document.createDocumentFragment();
+  output.append("match found\n");
+  matches.forEach((match, index) => {
+    if (index) output.append("\n");
+    output.append("> ");
+    const link = document.createElement("a");
+    link.href = match.href || "#published";
+    link.textContent = match.name;
+    output.append(link);
+  });
+  setTerminalOutput(output);
+}
+
+function runTerminalCommand(command) {
+  const trimmedCommand = command.trim();
+  if (trimmedCommand === "-help") {
+    showTerminalHelp();
+  } else if (trimmedCommand === "clear") {
+    setTerminalOutput("");
+  } else if (trimmedCommand === "status" || trimmedCommand === "notes" || trimmedCommand === "published") {
+    if (trimmedCommand === "status") {
+      setTerminalOutput("status opened");
+    } else if (trimmedCommand === "notes") {
+      setTerminalOutput("notes opened");
+    } else if (trimmedCommand === "published") {
+      setTerminalOutput("published opened");
+    }
+    location.hash = trimmedCommand;
+  } else if (trimmedCommand === "theme -l") {
+    applyTheme("light", true);
+    setTerminalOutput("theme changed");
+  } else if (trimmedCommand === "theme -d") {
+    applyTheme("dark", true);
+    setTerminalOutput("theme changed");
+  } else {
+    const search = trimmedCommand.match(/^find\s+-"([^"]+)"$/);
+    if (search) showSearchResults(search[1]);
+    else setTerminalOutput("wrong input");
+  }
+  if (terminalInput) terminalInput.value = "";
+}
+
+function showArticle(slug) {
+  const note = notes.find((entry) => entry.slug === decodeURIComponent(slug));
+  if (!note || !articleContent) return false;
+
+  articleContent.replaceChildren();
+  const title = document.createElement("h1");
+  title.textContent = note.name;
+  const metadata = document.createElement("dl");
+  metadata.className = "article-metadata";
+  Object.entries(note.metadata).forEach(([key, value]) => {
+    const label = document.createElement("dt");
+    label.textContent = key;
+    const detail = document.createElement(key === "published" ? "time" : "dd");
+    detail.textContent = value;
+    if (key === "published") detail.dateTime = value.replace(" ", "T");
+    metadata.append(label, detail);
+  });
+  const body = document.createElement("div");
+  body.className = "markdown-body";
+  body.append(renderMarkdown(note.markdown));
+  articleContent.append(title, metadata, body);
+  document.title = `Alejandro — ${note.name}`;
+  return true;
+}
 
 function normalizeCell(cell) {
   if (typeof cell === "object" && cell !== null) {
@@ -196,18 +433,50 @@ function showView(name) {
   document.title = `Alejandro — ${name}`;
 }
 
+function focusTerminal() {
+  requestAnimationFrame(() => terminalInput?.focus({ preventScroll: true }));
+}
+
 function route() {
-  const name = location.hash.slice(1) || "status";
-  showView(document.querySelector(`#${CSS.escape(name)}`) ? name : "status");
+  const [name, slug] = location.hash.slice(1).split("/");
+  if (name === "article" && slug) {
+    showView("article");
+    if (showArticle(slug)) {
+      focusTerminal();
+      return;
+    }
+  }
+
+  const viewName = name || "status";
+  showView(document.querySelector(`#${CSS.escape(viewName)}`) ? viewName : "status");
+  if (viewName === "notes" && history.state?.notesScrollY !== undefined) {
+    requestAnimationFrame(() => window.scrollTo(0, history.state.notesScrollY));
+  }
+  focusTerminal();
 }
 
 updateClock();
 setInterval(updateClock, 1000);
+updateStatusTable();
+setInterval(updateStatusTable, 60000);
 window.addEventListener("hashchange", route);
+interactiveTerminal?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  runTerminalCommand(terminalInput?.value ?? "");
+});
+document.querySelector("#notes-table")?.addEventListener("click", () => {
+  history.replaceState({ notesScrollY: window.scrollY }, "", location.href);
+});
+articleBack?.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (history.length > 1) history.back();
+  else location.hash = "notes";
+});
 themeToggle?.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
   applyTheme(nextTheme, true);
 });
 applyTheme(document.documentElement.dataset.theme);
-Object.values(tables).forEach(renderAsciiTable);
+Object.values(tables).filter((table) => table !== tables.status).forEach(renderAsciiTable);
+updateNotesTable();
 route();

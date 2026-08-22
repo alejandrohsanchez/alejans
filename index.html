@@ -27,22 +27,35 @@
     </header>
     <div class="terminal-rule" aria-hidden="true"></div>
 
+    <form id="interactive-terminal" class="interactive-terminal">
+      <label class="terminal-input-line" for="terminal-input">
+        <span aria-hidden="true">&gt; </span>
+        <input id="terminal-input" name="command" type="text" autocomplete="off" spellcheck="false" placeholder="'-help' for commands" />
+      </label>
+      <div id="terminal-output" class="terminal-output" role="status" aria-live="polite"></div>
+    </form>
+
     <section id="status" class="view">
       <p class="command">~/status $ now</p>
-      <h1>CURRENT STATUS<span class="cursor" aria-hidden="true">|</span></h1>
+      <h1>CURRENT STATUS</h1>
 
       <pre id="status-table" class="ascii-table" aria-label="Current status table"></pre>
     </section>
 
     <section id="notes" class="view" hidden>
       <p class="command">~/notes $ ls -t</p>
-      <h1>NOTES<span class="cursor" aria-hidden="true">|</span></h1>
+      <h1>NOTES</h1>
       <pre id="notes-table" class="ascii-table" aria-label="Notes table"></pre>
+    </section>
+
+    <section id="article" class="view" hidden>
+      <a id="article-back" class="command article-back" href="#notes">&lt;back&gt;</a>
+      <div id="article-content"></div>
     </section>
 
     <section id="published" class="view" hidden>
       <p class="command">~/published $ ls -t</p>
-      <h1>PUBLISHED<span class="cursor" aria-hidden="true">|</span></h1>
+      <h1>PUBLISHED</h1>
       <pre id="published-table" class="ascii-table" aria-label="Published projects table"></pre>
     </section>
 
@@ -53,6 +66,7 @@
     </footer>
   </main>
 
+  <script src="notes.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
