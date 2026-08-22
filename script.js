@@ -365,9 +365,10 @@ function getTimeZoneOffsetMinutes(date, timeZone) {
     second: "2-digit",
     hourCycle: "h23",
   }).formatToParts(date);
-  const values = Object.fromEntries(
-    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
-  );
+  const values = {};
+  parts.forEach((part) => {
+    if (part.type !== "literal") values[part.type] = part.value;
+  });
   const timeInUtc = Date.UTC(
     Number(values.year),
     Number(values.month) - 1,
@@ -448,7 +449,8 @@ function route() {
   }
 
   const viewName = name || "status";
-  showView(document.querySelector(`#${CSS.escape(viewName)}`) ? viewName : "status");
+  const view = document.getElementById(viewName);
+  showView(view?.classList.contains("view") ? viewName : "status");
   if (viewName === "notes" && history.state?.notesScrollY !== undefined) {
     requestAnimationFrame(() => window.scrollTo(0, history.state.notesScrollY));
   }
